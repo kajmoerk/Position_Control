@@ -19,11 +19,7 @@ const float DXL_PROTOCOL_VERSION = 2.0;
 double emg_ch0, emg_ch1, emg_ch0_prev, emg_ch1_prev, pos_output;
 
 //Timer
-<<<<<<< Updated upstream
-  const int EMGsignal_Interval = 10;
-=======
   const int EMGsignal_Interval = 15;
->>>>>>> Stashed changes
   const int Motor_Interval = 100;
   unsigned long currentMillis = 0;
   unsigned long previousEMGsignalMillis = 0;
@@ -108,7 +104,6 @@ void get_emg()
         }*/
       }
     }
-<<<<<<< Updated upstream
     /*if (valid_pkg)
     {
       //Serial.print("RAW:");
@@ -133,32 +128,7 @@ void get_emg()
         emg_ch0_prev = emg_ch0;
       }
     }*/
-=======
-      /*if (valid_pkg)
-      {
-        //Serial.print("RAW:");
-        Serial.println(YnValue[1], DEC);
-        Serial.print(",");
-        Serial.println(YnValue[0], DEC);
-        emg_ch0 = YnValue[0];
-        emg_ch1 = YnValue[1];
-        // Move joint in positive direction: 
-        if(emg_ch0 > emg_ch1 && emg_ch0 > 99 && emg_ch0 > emg_ch0_prev)
-        {
-          pos_output =  map(emg_ch0, 100, 1000, 90, 260);
-          dxl.setGoalPosition(motornumber, pos_output, UNIT_DEGREE);
-          emg_ch0_prev = emg_ch0;
-          emg_ch1_prev = emg_ch1;
-        }
-        if(emg_ch1 > emg_ch0 && emg_ch1 > 99 && emg_ch1 > emg_ch1_prev)
-        {
-          pos_output =  map(emg_ch1, 100, 1000, 260, 90);
-          dxl.setGoalPosition(motornumber, pos_output, UNIT_DEGREE);
-          emg_ch1_prev = emg_ch1;
-          emg_ch0_prev = emg_ch0;
-        }
-      }*/
+
     previousEMGsignalMillis += EMGsignal_Interval;
->>>>>>> Stashed changes
   }
 }
