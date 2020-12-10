@@ -17,10 +17,14 @@ bool valid_pkg = false;
 const uint8_t DXL_DIR_PIN = 2; // DYNAMIXEL Shield DIR PIN
 const float DXL_PROTOCOL_VERSION = 2.0;
 double emg_ch0, emg_ch1, emg_ch0_prev, emg_ch1_prev, pos_output;
-//BUTTON:
-const byte interruptPin = 3;       // the number of the pushbutton pin
-volatile byte state = HIGH;
-int motornumber = 1;
+
+//Timer
+  const int EMGsignal_Interval = 10;
+  const int Motor_Interval = 100;
+  unsigned long currentMillis = 0;
+  unsigned long previousEMGsignalMillis = 0;
+  unsigned long previousMotorMillis = 0;
+//
 Dynamixel2Arduino dxl(DXL_SERIAL, DXL_DIR_PIN);
 using namespace ControlTableItem;
 #define DXL_SERIAL Serial3
@@ -34,8 +38,6 @@ void setup() {
   dxl.begin(57600);
   Serial2.begin(115200);
   pinMode(2, OUTPUT);
-  pinMode(interruptPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(interruptPin), blink, FALLING);
   emg_ch0_prev = 0;
   emg_ch1_prev = 0;
   for (int i = 1; i < 4; i++)
@@ -48,26 +50,12 @@ void setup() {
   }
 }
 
-
-/*double printHighLowBytesHEX(double weightFactor, double prevvalue){
-  int EMG1Signal = word(returnedValues[19], returnedValues[20]);
-  int EMG2Signal = word(returnedValues[21], returnedValues[22]);
-  if(EMG1Signal > 100 && EMG1Signal < 1500){
-    YnValue = (100*weightFactor * EMG1Signal + (100- weightFactor) * YnValue);
-    Serial.println(YnValue, DEC);
-    Serial.print(",");
-    Serial.println(EMG1Signal, DEC);
-    return YnValue;
-  }
-  else{
-    EMG1Signal = 0;
-    //Serial.println(EMG1Signal, DEC);
-    return YnValue;
-  }
-
-}*/
-
 void loop() {
+  get_emg();
+}
+
+void get_emg()
+{
   sum = 0;
   valid_pkg = false;
   while (!valid_pkg)
@@ -111,6 +99,9 @@ void loop() {
         Serial.println(YnValue[1], DEC);
         Serial.print(",");
         Serial.println(YnValue[0], DEC);
+        /*for (int i = 0; i <= sizeof(returnedValues)/2; i++) {
+        returnedValues[i] = 0;
+        }*/
       }
     }
     /*if (valid_pkg)
@@ -138,21 +129,4 @@ void loop() {
       }
     }*/
   }
-}
-
-
-void blink()
-{
-  state = !state;
-  ++motornumber;
-  if(motornumber > 3)
-  {
-    motornumber = 1;
-  }
-  Serial.println(motornumber);
-  delay(100);
-  emg_ch1_prev = 0; 
-  emg_ch1 = 0;
-  emg_ch0_prev = 0; 
-  emg_ch0 = 0;
 }
