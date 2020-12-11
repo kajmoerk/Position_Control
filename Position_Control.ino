@@ -5,7 +5,7 @@
 #include <IRLibCombo.h>       // After all protocols, include this
 IRdecode myDecoder;
 #include <IRLibRecv.h>
-#include "varaibles.h"
+
 #define DXL_SERIAL Serial3
 #define DEBUG_SERIAL Serial
 double oldpos[5] = {180,180,180,270,50};
@@ -110,18 +110,24 @@ void get_emg()
     EMGSignal[1] = word(returnedValues[21], returnedValues[22]);
     for (int i = 0; i < 2; i++)
     {
-      if(EMGSignal[i] > 40 && EMGSignal[i] < 1200 && lowByte(sum) == 0xff)
+      if(EMGSignal[i] < 3000 && lowByte(sum) == 0xff)
       {
         YnValue[i] = weightFactor * EMGSignal[i] + (1.0- weightFactor) * YnValue[i];
         valid_pkg = true;
         previousEMGsignalMillis = millis();
-        Serial.print(YnValue[1], DEC);
-        Serial.print(",");
-        Serial.println(YnValue[0], DEC);
-        for (int i = 0; i <= sizeof(returnedValues)/2; i++) {
-        returnedValues[i] = 0;
+        if (i == 1)
+        {
+          Serial.println(YnValue[i], DEC);
+        }
+        if (i == 0)
+        {
+          Serial.print(",");
+          Serial.println(YnValue[0], DEC);
         }
       }
+    }
+    for (int i = 0; i <= sizeof(returnedValues)/2; i++) {
+      returnedValues[i] = 0;
     }
     if (valid_pkg)
     {
