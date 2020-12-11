@@ -65,7 +65,7 @@ void setup() {
       dxl.writeControlTableItem(PROFILE_ACCELERATION, i, 100);
       dxl.writeControlTableItem(PROFILE_VELOCITY, i , 100);
       dxl.torqueOn(i);
-      dxl.setGoalPosition(i, pos_output[i], UNIT_DEGREE);
+      dxl.setGoalPosition(i, pos_output[i-1], UNIT_DEGREE);
 
   }
   dxl.setGoalPosition(4, 270, UNIT_DEGREE);
@@ -164,9 +164,9 @@ void get_emg()
         if(motornumber == 1)
         {
           pos_output[motornumber] += 0.5;
-          if(pos_output[motornumber] > 270)
+          if(pos_output[motornumber] > 230)
           {
-            pos_output[motornumber] = 270;
+            pos_output[motornumber] = 230;
           }
         }
         if (motornumber <= 3 && oldpos[motornumber] != pos_output[motornumber])
@@ -205,9 +205,9 @@ void get_emg()
         if(motornumber == 1)
         {
           pos_output[motornumber] -= 0.5;
-          if(pos_output[motornumber] < 90)
+          if(pos_output[motornumber] < 0)
           {
-            pos_output[motornumber] = 90;
+            pos_output[motornumber] = 0;
           }
         }
         if (motornumber <= 3 && oldpos[motornumber] != pos_output[motornumber])
@@ -217,8 +217,8 @@ void get_emg()
         }
         else if(!gripperclosed && motornumber ==4)
         {
-          dxl.setGoalPosition(4, 200, UNIT_DEGREE);
-          dxl.setGoalPosition(5, 155, UNIT_DEGREE);
+          dxl.setGoalPosition(4, 210, UNIT_DEGREE);
+          dxl.setGoalPosition(5, 165, UNIT_DEGREE);
           gripperclosed = true;
         }
         emg_ch1_prev = emg_ch1;
