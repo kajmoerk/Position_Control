@@ -8,10 +8,10 @@ IRdecode myDecoder;
 
 #define DXL_SERIAL Serial3
 #define DEBUG_SERIAL Serial
-double oldpos[5] = {180,180,180,270,50};
-double pos_output[5] = {180, 180, 180, 270, 50};
+double oldpos[6] = {0,180,180,180,270,50};
+double pos_output[6] = {0,180, 180, 180, 270, 50};
 
-bool gripperclosed = true;;
+bool gripperclosed = false;
 bool runnext = false;
 int returnedValues[24];
 double EMGSignal[2] = {0,0};
@@ -65,7 +65,7 @@ void setup() {
       dxl.writeControlTableItem(PROFILE_ACCELERATION, i, 100);
       dxl.writeControlTableItem(PROFILE_VELOCITY, i , 100);
       dxl.torqueOn(i);
-      dxl.setGoalPosition(i, pos_output[i-1], UNIT_DEGREE);
+      dxl.setGoalPosition(i, pos_output[i], UNIT_DEGREE);
 
   }
   dxl.setGoalPosition(4, 270, UNIT_DEGREE);
@@ -88,7 +88,7 @@ void get_emg()
 {
   while (valid_pkg == false)
   {
-    Serial.println("Package:");
+    Serial.println("package:");
     if(Serial2.available()){
       if(Serial2.read() == 0x7E && Serial2.read() == 0x00 && Serial2.read() == 0x14 && Serial2.read() == 0x83 && Serial2.read()== 0x55 && Serial2.read()==0x66)
       {
