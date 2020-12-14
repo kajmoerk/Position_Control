@@ -13,17 +13,18 @@ int medianEMG2 = 0;
 double prevValue = 0;
 double weightFactor = 1.5/100.0;
 int sum = 0;
-bool valid_pkg = false;
+bool first_valid_pkg = false;
 const uint8_t DXL_DIR_PIN = 2; // DYNAMIXEL Shield DIR PIN
 const float DXL_PROTOCOL_VERSION = 2.0;
 double emg_ch0, emg_ch1, emg_ch0_prev, emg_ch1_prev, pos_output;
 
 //Timer
-  const int EMGsignal_Interval = 15;
+  const int EMGsignal_Interval = 10000;
   const int Motor_Interval = 100;
   unsigned long currentMillis = 0;
   unsigned long previousEMGsignalMillis = 0;
   unsigned long previousMotorMillis = 0;
+  unsigned long previousMillis = 0;
 //
 Dynamixel2Arduino dxl(DXL_SERIAL, DXL_DIR_PIN);
 using namespace ControlTableItem;
@@ -40,18 +41,13 @@ void setup() {
   pinMode(2, OUTPUT);
   emg_ch0_prev = 0;
   emg_ch1_prev = 0;
-  for (int i = 1; i < 4; i++)
-  {
-      dxl.torqueOff(i);
-      dxl.setOperatingMode(i, OP_POSITION);
-      dxl.writeControlTableItem(PROFILE_ACCELERATION, i, 100);
-      dxl.writeControlTableItem(PROFILE_VELOCITY, i , 100);
-      dxl.torqueOn(i);
-  }
 }
 
 void loop() {
+  currentMillis = micros();
   get_emg();
+  Serial.println(currentMillis - previousMillis);
+  previousMillis = currentMillis;
 }
 
 void get_emg()
@@ -59,7 +55,6 @@ void get_emg()
   if (currentMillis - previousEMGsignalMillis >= EMGsignal_Interval)
   {
     sum = 0;
-    valid_pkg = false;
     Serial.println("Package:");
     //delay(4);
     if(Serial2.available() > 0){
@@ -92,43 +87,24 @@ void get_emg()
     EMGSignal[1] = word(returnedValues[21], returnedValues[22]);
     for (int i = 0; i < 2; i++)
     {
-      if(EMGSignal[i] > 40 && EMGSignal[i] < 1200 && lowByte(sum) == 0xff)
+      if(lowByte(sum) == 0xff)
       {
         YnValue[i] = weightFactor * EMGSignal[i] + (1.0- weightFactor) * YnValue[i];
-        valid_pkg = true;
-        Serial.println(YnValue[1], DEC);
-        Serial.print(",");
-        Serial.println(YnValue[0], DEC);
-        /*for (int i = 0; i <= sizeof(returnedValues)/2; i++) {
+        first_valid_pkg = true;
+        if (i == 0)
+        {
+          Serial.print(YnValue[i], DEC);
+        }
+        if (i == 1)
+        {
+          Serial.print("\t");
+          Serial.println(YnValue[i], DEC);
+        }
+        for (int i = 0; i <= sizeof(returnedValues)/2; i++) {
         returnedValues[i] = 0;
-        }*/
+        }
       }
     }
-    /*if (valid_pkg)
-    {
-      //Serial.print("RAW:");
-      Serial.println(YnValue[1], DEC);
-      Serial.print(",");
-      Serial.println(YnValue[0], DEC);
-      emg_ch0 = YnValue[0];
-      emg_ch1 = YnValue[1];
-      // Move joint in positive direction: 
-      if(emg_ch0 > emg_ch1 && emg_ch0 > 99 && emg_ch0 > emg_ch0_prev)
-      {
-        pos_output =  map(emg_ch0, 100, 1000, 90, 260);
-        dxl.setGoalPosition(motornumber, pos_output, UNIT_DEGREE);
-        emg_ch0_prev = emg_ch0;
-        emg_ch1_prev = emg_ch1;
-      }
-      if(emg_ch1 > emg_ch0 && emg_ch1 > 99 && emg_ch1 > emg_ch1_prev)
-      {
-        pos_output =  map(emg_ch1, 100, 1000, 260, 90);
-        dxl.setGoalPosition(motornumber, pos_output, UNIT_DEGREE);
-        emg_ch1_prev = emg_ch1;
-        emg_ch0_prev = emg_ch0;
-      }
-    }*/
-
     previousEMGsignalMillis += EMGsignal_Interval;
   }
 }
