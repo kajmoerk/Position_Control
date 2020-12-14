@@ -19,7 +19,7 @@ const float DXL_PROTOCOL_VERSION = 2.0;
 double emg_ch0, emg_ch1, emg_ch0_prev, emg_ch1_prev, pos_output;
 
 //Timer
-  const int EMGsignal_Interval = 10000;
+  unsigned long EMGsignal_Interval = 10000;
   const int Motor_Interval = 100;
   unsigned long currentMillis = 0;
   unsigned long previousEMGsignalMillis = 0;
@@ -35,7 +35,7 @@ ExponentialFilter<long> ADCFilter(1, 0);
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200);
+  DEBUG_SERIAL.begin(115200);
   dxl.begin(57600);
   Serial2.begin(115200);
   pinMode(2, OUTPUT);
@@ -44,38 +44,24 @@ void setup() {
 }
 
 void loop() {
-  currentMillis = micros();
   get_emg();
-  Serial.println(currentMillis - previousMillis);
-  previousMillis = currentMillis;
 }
 
 void get_emg()
 {
+  sum = 0;
+  currentMillis = micros();
   if (currentMillis - previousEMGsignalMillis >= EMGsignal_Interval)
   {
-    sum = 0;
-    Serial.println("Package:");
-    //delay(4);
     if(Serial2.available() > 0){
-      // && Serial2.read() == 0x00 && Serial2.read() == 0x14 && Serial2.read() == 0x83 && Serial2.read()== 0x56 && Serial2.read()==0x78
-      if(Serial2.read() == 0x7E && Serial2.read() == 0x00 && Serial2.read() == 0x14 && Serial2.read() == 0x83 && Serial2.read()== 0x56 && Serial2.read()==0x78)
-      {
-          returnedValues[0] = 0x7E;
-          returnedValues[1] = 0x00;
-          returnedValues[2] = 0x14;
-          returnedValues[3] = 0x83;
-          returnedValues[4] = 0x56;
-          returnedValues[5] = 0x78;
-          //Serial.println("Size of start array = " + String(sizeof(returnedValues)/2));
-          for (int i = 6; i <= sizeof(returnedValues)/2; i++) {
-            returnedValues[i] = Serial2.read();
-            //Serial.println(returnedValues[i], HEX);
-          }       
+      for (int i = 0; i <= 24; i++) {
+        if(Serial2.available() > 0){
+         returnedValues[i] = Serial2.read(); 
+        }
       }
-    }
-    for (int i = 0; i < sizeof(returnedValues)/2; i++) {
-      if (i > 2 && i < (sizeof(returnedValues)/2))
+    }   
+    for (int i = 0; i < 24; i++) {
+      if (i > 2 && i < 24)
       {
         sum += returnedValues[i];
         //Serial.print("Nr " + String(i) + ":");
@@ -99,9 +85,6 @@ void get_emg()
         {
           Serial.print("\t");
           Serial.println(YnValue[i], DEC);
-        }
-        for (int i = 0; i <= sizeof(returnedValues)/2; i++) {
-        returnedValues[i] = 0;
         }
       }
     }
