@@ -21,9 +21,9 @@ void setup() {
   //Serial port setup:
   DEBUG_SERIAL.begin(115200);
   dxl.begin(57600);
-  Serial2.begin(115200);
+  Serial2.begin(115200);//Xbee serial port.
   //Pin mode setup:
-  pinMode(2, OUTPUT);
+  pinMode(2, OUTPUT);//Read/Write pin for RS485.
   //Start value setup:
   emg_ch0_prev = 0;
   emg_ch1_prev = 0;
