@@ -26,16 +26,14 @@ void get_emg()
         YnValue[i] = weightFactor * EMGSignal[i] + (1.0- weightFactor) * YnValue[i];
         if (i == 0)
         {
-          //Serial.print(YnValue[i], DEC); //Print filtered channel_1 data.
+          Serial.print(YnValue[i], DEC); //Print filtered channel_1 data.
         }
         if (i == 1)
         {
-          //Serial.print("\t");
-          //Serial.print(YnValue[i], DEC); //Print filtered channel_2 data.
+          Serial.print("\t");
+          Serial.print(YnValue[i], DEC); //Print filtered channel_2 data.
         }
       }
-      //Serial.print("\t");
-      Serial.println(dxl.getPresentVelocity(motornumber, UNIT_RPM));
     }
     previousEMGsignalMillis += EMGsignal_Interval; //Update the time for next run.
     //We make the package invalid by changing index 0 to 0xff:
