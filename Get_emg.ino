@@ -19,21 +19,23 @@ void get_emg()
     }
     EMGSignal[0] = word(returnedValues[19], returnedValues[20]);//Combine channel_1 lsb and msb
     EMGSignal[1] = word(returnedValues[21], returnedValues[22]);//Combine channel_2 lsb and msb
-    for (int i = 0; i < 2; i++) // Run filtering for each channel
+    if(lowByte(sum) == 0xff)//Only if the package sum is valid.
     {
-      if(lowByte(sum) == 0xff)//Only if the package sum is valid.
+      for (int i = 0; i < 2; i++) // Run filtering for each channel
       {
         YnValue[i] = weightFactor * EMGSignal[i] + (1.0- weightFactor) * YnValue[i];
         if (i == 0)
         {
-          Serial.print(YnValue[i], DEC); //Print filtered channel_1 data.
+          //Serial.print(YnValue[i], DEC); //Print filtered channel_1 data.
         }
         if (i == 1)
         {
-          Serial.print("\t");
-          Serial.println(YnValue[i], DEC); //Print filtered channel_2 data.
+          //Serial.print("\t");
+          //Serial.print(YnValue[i], DEC); //Print filtered channel_2 data.
         }
       }
+      //Serial.print("\t");
+      Serial.println(dxl.getPresentVelocity(motornumber, UNIT_RPM));
     }
     previousEMGsignalMillis += EMGsignal_Interval; //Update the time for next run.
     //We make the package invalid by changing index 0 to 0xff:

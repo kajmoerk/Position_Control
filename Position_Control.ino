@@ -36,10 +36,11 @@ void setup() {
   {
       dxl.torqueOff(i);
       dxl.setOperatingMode(i, OP_POSITION);
-      dxl.writeControlTableItem(PROFILE_ACCELERATION, i, 100);
-      dxl.writeControlTableItem(PROFILE_VELOCITY, i , 100);
+      dxl.writeControlTableItem(PROFILE_ACCELERATION, i, 44);
+      dxl.writeControlTableItem(PROFILE_VELOCITY, i , 44);
       dxl.torqueOn(i);
       dxl.setGoalPosition(i, pos_output[i], UNIT_DEGREE);
+      
 
   }
   dxl.setGoalPosition(4, 270, UNIT_DEGREE);
